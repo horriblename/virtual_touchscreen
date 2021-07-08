@@ -52,12 +52,6 @@ struct event_block_data{
 int fd, vts_fd;
 char* tp_device_path;
 char* vts_device_path;
-// --- touch variables
-/*TODO convert to struct*/
-int touch_x = -1;
-int touch_y = -1;
-int initial_x = -1;
-int initial_y = -1;
 // geometry of area to map to on display
 int geometry_x = 100;
 int geometry_y = 100;
@@ -133,6 +127,7 @@ int scan_devices(char ** tp_device_path, char ** vts_device_path)
 	}
 
    if(!tp_found){
+      fprintf(stderr, "Auto detecting touchpad didn't work, select it manually below...\n");
       fprintf(stderr, "select the device event number for your touchpad: ");
       scanf("%d", &devnum);
 
@@ -143,6 +138,7 @@ int scan_devices(char ** tp_device_path, char ** vts_device_path)
    }
 
    if(!vts_found){
+      fprintf(stderr, "Auto detecting virtual touchscreen didn't work, select it manually below...\n");
       fprintf(stderr, "select the device event number for your virtual touchscreen: ");
       scanf("%d", &devnum);
 
@@ -191,7 +187,7 @@ void record_absdata(int fd, struct dev_absdata * device_absdata)
  * open device, grabs it for exclusive access,
  * then record some data required later
  */
-int init_dev_event_reader(){
+int test_and_grab_devices(){
    char name[256] = "???";
 	if ((getuid ()) != 0) {
         fprintf(stderr, "you are not root! this may not work...\n");
@@ -211,8 +207,6 @@ int init_dev_event_reader(){
     printf("device file = %s\n", tp_device_path);
     printf("device name = %s\n", name);
 
-   ioctl(fd, EVIOCGRAB, (void*)1);
-
    record_absdata(fd, &tp_device_absdata);
 
     /* open virtual touchscreen device */
@@ -228,6 +222,8 @@ int init_dev_event_reader(){
    printf("device name = %s\n", name);
 
    record_absdata(vts_fd, &vts_device_absdata);
+
+   ioctl(fd, EVIOCGRAB, (void*)1); // grab touchpad after making sure both devices are valid
 
    return 0;
 }
@@ -371,8 +367,7 @@ int main(int argc, char** argv)
          return EXIT_FAILURE;
    }
 
-	int ret = init_dev_event_reader();
-	if (ret == 1)
+	if (test_and_grab_devices())
 		return EXIT_FAILURE;
 
    if (MAP_TO_ENTIRE_SCREEN){
@@ -381,10 +376,6 @@ int main(int argc, char** argv)
       geometry_w = vts_device_absdata.max_value_abs_x - vts_device_absdata.min_value_abs_x;
       geometry_h = vts_device_absdata.max_value_abs_y - vts_device_absdata.min_value_abs_y;
    }
-
-   printf("geo: %d %d %d %d",
-   geometry_x,geometry_y,geometry_w, geometry_h);
-
 
 	signal(SIGINT, interrupt_handler);
 	signal(SIGTERM, interrupt_handler);
