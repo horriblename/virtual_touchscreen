@@ -9,3 +9,5 @@ modules.order
 *.mod.o
 *.o
 *.jar
+touchpad_reader/
+tpats
