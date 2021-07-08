@@ -1,4 +1,12 @@
-# virtual_touchscreen
+# touchpad_as_touchscreen
+
+Use your touchpad as a touchscreen!
+
+An “add-on” to [virtual_touchscreen](https://github.com/vi/virtual_touchscreen)
+
+touchpad_as_touchscreen can be used with virtual_touchscreen or on a device with a touchscreen.
+
+## virtual_touchscreen
 
 Simple virtual input device for testing things in Linux. Creates a character device and an input device.
 
@@ -6,7 +14,7 @@ Simple virtual input device for testing things in Linux. Creates a character dev
 
 # Building
 
-## module
+## `virtual_touchpad` module
 
 Building for current kernel:
 
@@ -16,11 +24,21 @@ Building for custom kernel (from a configured kernel directory):
 
     make modules M=/path/to/virtual_touchscreen/
 
+## `touchpad_as_touchscreen`
+
+Building `touchpad_as_touchscreen`:
+
+```
+make touchpad_as_touchscreen
+```
+
+This will result in the `tpats` binary
+
 ## application
 
-Use run `virtual_touchscreen.clj` or just use pre-built `virtual_touchscreen.jar` from Github releases
+To test `virtual_touchscreen` module,use run `virtual_touchscreen.clj` or just use pre-built `virtual_touchscreen.jar` from Github releases
 
-# Using
+# Using virtual_touchscreen module
 
 ## Some testing
 
@@ -80,12 +98,26 @@ It listens port 9494 and provides virtual_touchscreen input for connected client
 Example (checked with Clojure 1.3, may need updating):
 
     hostA$  java -cp clojure.jar clojure.main virtual_touchscreen.clj
-
+    
     hostB#  nc hostA 9494 > /dev/virtual_touchscreen
 
-## Misc
+# Using touchpad as touchscreen
 
-There is also experimental script to read `/dev/input/eventX` of some real device and output data for virtual_touchscreen. It is long unmaintained although. Maybe see forks for alternative script.
+Run 
+
+```
+./tpats
+```
+
+the program will try to detect any touchpad and touchscreen event files (/dev/input/eventX), if none are detected, the user will be prompted to choose from the list of event files
+
+If you already know the number of *both* event files, you can use 
+
+```
+tpats [toucpad_event_number touchscreen_event_number]
+```
+
+e.g. `tpats 15 18` if touchpad is `/dev/input/event15` and touchscreen is `/dev/input/event18`
 
 ## Licence
 
