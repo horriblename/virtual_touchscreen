@@ -10,5 +10,8 @@ default:
 	$(MAKE) -C $(KDIR) M=$$PWD modules
 
 clean:
-	rm -f *.o *.cmd *.mod.c .*.o* .*.ko* *~ *.ko Module.markers modules.order Module.symvers 
+	rm -f *.o *.cmd *.mod.c .*.o* .*.ko* *~ *.ko Module.markers modules.order Module.symvers
 	rm -rf .tmp_versions/
+
+touchpad_as_touchscreen: touchpad_as_touchscreen.c
+	$(CC) -o tpats touchpad_as_touchscreen.c
